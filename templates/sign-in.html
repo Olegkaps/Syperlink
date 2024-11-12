@@ -1,0 +1,6 @@
+{% extends "sign.html" %}
+{% block form %}
+{{ super() }}
+	{{ handle_flash() }}
+	<p>Если у вас еще нет аккуунта, пройдите регистрацию.</p>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+{{ super() }}
+    {% if not link %}
+    <h1>Сократить ссылку</h1>
+    <form class="link" action="" method="POST">
+        <p>
+            <input class="linktext" type="url" name="link">
+        </p>
+        <p>
+            <input class="linksub" type="submit" value="Сократить">
+        </p>
+    </form>
+    {% else %}
+    <h1>Сокращенная ссылка</h1>
+    <form class="link" action="">
+        <p>
+            <input class="linktext" type="text" value={{ link }} id="short_link">
+        </p>
+        <p>
+            <button class="copylink" onclick="copyLink()" type="button">Скопировать</button>
+        </p>
+    </form>
+    {% endif %}
+{% endblock %}
