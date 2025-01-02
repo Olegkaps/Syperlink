@@ -3,6 +3,7 @@
 {{ super() }}
     {% if not link %}
     <h1>Сократить ссылку</h1>
+    {{ handle_flash() }}
     <form class="link" action="" method="POST">
         <p>
             <input class="linktext" type="url" name="link">
@@ -13,6 +14,7 @@
     </form>
     {% else %}
     <h1>Сокращенная ссылка</h1>
+    {{ handle_flash() }}
     <form class="link" action="">
         <p>
             <input class="linktext" type="text" value={{ link }} id="short_link">

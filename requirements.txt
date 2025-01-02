@@ -1,0 +1,13 @@
+Flask
+flask_sqlalchemy
+Flask-Mail
+email_validator
+SQLalchemy
+flask_wtf
+redis
+pytest
+python-dotenv
+flask-migrate
+psycopg2
+asyncpg
+alembic

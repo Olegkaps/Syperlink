@@ -12,8 +12,10 @@
     {% block form %}
     <form class="sign-in" action="" method="POST">
     <div>{{ form.csrf_token }}</div>
+	{{ handle_flash() }}
     {% endblock %}
     
+
     {% for field in form if field.name not in ['csrf_token', ] %}
  	<p>
  	    {{ field.label() }}
