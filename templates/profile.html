@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+{{ super() }}
+    <h1>Аккаунт </h1>
+    
+    <p>Это ваш профиль, о, Великий(ая) <b>{{ username }}</b>!</p>
+    <form class="exit" action="" method="POST">
+        <p>
+            <input class="exit" type="submit" value="Выйти">
+        </p>
+    </form>
+
+    <br>
+    <br>
+
+    <p>Информация по ссылкам.</p>
+    {% if links != [] -%}    
+    {% for link in links -%}
+    <p> <b>{{ link.__repr__().split()[1] }}</b>: {{ link.__repr__().split()[2] }}
+    {%- endfor %}
+    {% else %}
+    <p> На данный момент у вас нет ссылок в базе данных
+    {%- endif %}
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+{{ super() }}
+    <h1>{{ title }}</h1>
+    <div class="auth_menu">
+    {% for name, ref in auth_menu.items() %}
+        <a {% if name == title %} href="#" class="current" {% else %} href={{ref}} {% endif %} >{{name}}</a>
+    {% endfor %}
+    </div>
+    <div class="form">
+
+    {% block form %}
+    <form class="sign-in" action="" method="POST">
+    <div>{{ form.csrf_token }}</div>
+	{{ handle_flash() }}
+    {% endblock %}
+    
+
+    {% for field in form if field.name not in ['csrf_token', ] %}
+ 	<p>
+ 	    {{ field.label() }}
+ 	    {{ field() }}
+ 	    {% for error in field.errors %}
+ 		<p class="error">{{ error }}</p>
+ 	    {% endfor %}
+ 	</p>
+    {% endfor %}
+    </div>
+{% endblock %}

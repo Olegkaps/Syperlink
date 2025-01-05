@@ -1,0 +1,39 @@
+version: '0.0.1'
+
+services:
+
+  db:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 123
+      POSTGRES_INITDB_ARGS: '--encoding=UTF-8 --auth=scram-sha-256' 
+    volumes:
+      - ./pgdbdata:/var/lib/postgresql/data/
+    ports:
+      - "5434:5432"
+    
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  redis: 
+    image: redislabs/redismod
+    container_name: redis
+    ports:
+      - '6379:6379'
+  
+  syperlink:
+    build: .
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 57:5000
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  pgdbdata: null

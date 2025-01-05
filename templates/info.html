@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+{{ super() }}
+    <h1>Информация по ссылкам.</h1>
+    <br>
+    <br>
+    {% if name != "" %}
+        <p> Список ссылок для пользователя <b>{{ name }}</b>
+        {% if links != [] -%}    
+        {% for link in links -%}
+        <p> <b>{{ link.__repr__().split()[1] }}</b>: {{ link.__repr__().split()[2] }}
+        {%- endfor %}
+        {% else %}
+        <p> На данный момент нет ссылок в базе данных от данного пользователя.
+        {%- endif %}
+    {% else %}
+        <form class="info-form" action="" method="POST">
+        <div>{{ form.csrf_token }}</div>
+        {{ handle_flash() }}
+    
+        {% for field in form if field.name not in ['csrf_token', ] %}
+         <p>
+             {{ field.label() }}
+             {{ field() }}
+             {% for error in field.errors %}
+             <p class="error">{{ error }}</p>
+             {% endfor %}
+         </p>
+        {% endfor %}
+        </form>
+        </div>
+    {% endif %}
+{% endblock %}
