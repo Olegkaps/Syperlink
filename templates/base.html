@@ -14,9 +14,9 @@
 <!DOCTYPE html>
 <html lang="ru-RU">
     <meta charset="UTF-8">
-    <link rel="stylesheet" href={{ url_for('static', filename='css/styles.css') }} />
-    <link rel="icon" href={{ url_for('static', filename='png/icon.png') }}>
-    <script src={{ url_for('static', filename='js/copylink.js') }}></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='png/icon.ico') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='js/copylink.js') }}"></script>
     <head>
         <title>{{ title }}</title>
     </head>

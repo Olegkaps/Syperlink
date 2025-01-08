@@ -1,11 +1,11 @@
 from dotenv import load_dotenv
 import os
 
-from flask import Flask
+from flask import Flask, render_template
 
 
 from database import db
-from routes import syperlink
+from routes import syperlink, menu
 from dbactions import mail
 
 load_dotenv()
@@ -30,7 +30,13 @@ mail.init_app(app)
 ISDEBUG = True # False for relesae server
 
 
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("404.html", title="Не найдено", menu=menu), 404
+
+
+
+
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(debug=ISDEBUG)

@@ -14,6 +14,7 @@
     <br>
 
     <p>Информация по ссылкам.</p>
+    <div class="info">
     {% if links != [] -%}    
     {% for link in links -%}
     <p> <b>{{ link.__repr__().split()[1] }}</b>: {{ link.__repr__().split()[2] }}
@@ -21,4 +22,5 @@
     {% else %}
     <p> На данный момент у вас нет ссылок в базе данных
     {%- endif %}
+    </div>
 {% endblock %}

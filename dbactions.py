@@ -19,8 +19,9 @@ class DBManager():
         self.redis = Redis(host="redis", port=6379, decode_responses=True)
 
     def log_in(self, form): 
+        val = form.val.data
         user = db.session.execute(db.select(User).\
-                                  where(User.login == form.login.data)).scalar()
+                                  where(or_(User.login == val, User.email == val))).scalar()
         
         if user and check_password_hash(user.password, form.password.data) and user.is_confirmed and not user.is_blocked:
             return user
@@ -47,13 +48,44 @@ class DBManager():
             )
         
         msg.html = render_template("accept_email_email.html", user=new_user, link=link)
-        mail.send(msg)
-
 
         db.session.add(new_user)
+        mail.send(msg)
+
         db.session.commit()
         return new_user
-    
+
+    def change_password(self, form):
+        psw = generate_password_hash(form.password.data)
+        email = form.email.data
+        if not db.session.execute(db.select(User).where(User.email == email)).scalar():
+            return False
+
+        link = "http://" + os.getenv("DOMAIN") + \
+            "/users/change_password/" + self.link_to_accept_email(email)
+        
+        self.redis.setex(email, redis_accept_email_time, psw)
+        msg = Message( subject=f"Подтверждение смены пароля",
+            sender="kapshaioleg@yandex.ru",
+            recipients=[email],
+            )
+        msg.html = render_template("change_password_mail.html", link=link)
+        mail.send(msg)
+        return True
+
+    def accept_password_change(self, name):
+        email = self.redis.get(name)
+        if email:
+            password = self.redis.get(email)
+            db.session.execute(db.update(User).\
+                               values(password=password).\
+                                where(User.email == email))
+            db.session.commit()
+            self.redis.delete(name)
+            self.redis.delete(email)
+            return True
+        return False
+
     def link_to_accept_email(self, email):
         link = str(hash(email))
         self.redis.setex(link, redis_accept_email_time, email)
@@ -65,7 +97,6 @@ class DBManager():
                            values(is_confirmed=True).\
                            where(User.email == email))
         db.session.commit()
-        
         self.redis.delete(link)
         
     

@@ -22,18 +22,31 @@ services:
   redis: 
     image: redislabs/redismod
     container_name: redis
-    ports:
-      - '6379:6379'
+    expose:
+      - 6379
   
   syperlink:
     build: .
     volumes:
       - .:/usr/src/app
-    ports:
-      - 57:5000
+    expose:
+      - 5000
     depends_on:
       - db
       - redis
+  
+  nginx:
+    build: 
+      context: ./
+      dockerfile: ./nginx/Dockerfile
+    volumes:
+      - static_volume:/home/syperlink/static
+    ports:
+      - 80:80
+    depends_on:
+      - syperlink
+
 
 volumes:
   pgdbdata: null
+  static_volume: null

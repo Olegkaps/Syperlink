@@ -9,7 +9,7 @@ from dbactions import DB
 syperlink = Blueprint('sl', __name__)
 
 
-menu = {"Главная": "/", "Информация по ссылкам": "/links/info", "Аккаунт": "/users/profile"}
+menu = {"Сократить ссылку": "/", "Информация по ссылкам": "/links/info", "Аккаунт": "/users/profile"}
 authorization_menu = {"Войти": "/users/sign_in", "Зарегистрироваться": "/users/sign_up"}
 
 
@@ -30,7 +30,7 @@ def index():
         else:
             flash("Неудалось сократить ссылку", "error")
         
-    return render_template("index.html", title="Главная", menu=menu, link=link)
+    return render_template("index.html", title="Сократить ссылку", menu=menu, link=link)
 
 
 @syperlink.route("/<link>")
@@ -122,13 +122,20 @@ def accept_email_link(link):
 
 @syperlink.route("/users/change_password", methods=["GET", "POST"])
 def change_password():
-    # Сменить пароль через почту
-    pass
+    form = ChangePasswordForm()
+    if request.method == "POST" and form.validate_on_submit():
+        if DB.change_password(form):
+            flash("Письмо подтверждение отправлено на почту", "message")
+        else:
+            flash("Почта не найдена", "error")
+        return redirect(url_for("sl.sign_in"))
 
+    return render_template("change_password.html", title="Восстановление аккаунта", menu=menu, form=form)
 
-@syperlink.errorhandler(404)
-def not_found(e):
-    return render_template("404.html", title="Не найдено", menu=menu), 404
-
-
-
+@syperlink.route("/users/change_password/<name>")
+def accept_password_change(name):
+    if DB.accept_password_change(name):
+        flash("Успешно", "message")
+    else:
+        flash("Операция отклонена", "error")
+    return redirect(url_for("sl.sign_in"))

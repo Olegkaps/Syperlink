@@ -65,6 +65,17 @@ body {
     margin-top: 30px;
 }
 
+.info {
+    size: 100%;
+}
+
+.info p {
+    width: 100%;
+    background-color: rgb(249, 209, 209);
+    font-size: larger;
+    text-align: left;
+}
+
 .error {
     padding: 5px;
     background-color: #ee445b;

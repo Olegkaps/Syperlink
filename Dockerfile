@@ -1,10 +1,10 @@
-FROM python:latest
+FROM tiangolo/uvicorn-gunicorn:python3.11
 
 WORKDIR /superlink
 
 COPY requirements.txt ./
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 COPY . .
 
