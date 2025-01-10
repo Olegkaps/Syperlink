@@ -28,7 +28,7 @@ services:
   syperlink:
     build: .
     volumes:
-      - .:/usr/src/app
+      - ./migrations:/superlink/migrations
     expose:
       - 5000
     depends_on:
@@ -40,7 +40,7 @@ services:
       context: ./
       dockerfile: ./nginx/Dockerfile
     volumes:
-      - static_volume:/home/syperlink/static
+      - static_volume:/home/nginx/static
     ports:
       - 80:80
     depends_on:
@@ -50,3 +50,4 @@ services:
 volumes:
   pgdbdata: null
   static_volume: null
+  migrations: null

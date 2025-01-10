@@ -4,14 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import or_
 from dbutils import *
 
-from dotenv import load_dotenv
-from flask_mail import Message, Mail
-from flask import render_template
 
-load_dotenv()
-
-mail = Mail()
-
+from mail import mailer
 
 class DBManager():
     def __init__(self):
@@ -37,21 +31,11 @@ class DBManager():
                         password=generate_password_hash(form.password.data),
                         is_confirmed=False,
                         is_blocked=False)
-        
-        link = "http://" + os.getenv("DOMAIN") + \
-            "/users/accept/" + self.link_to_accept_email(new_user.email)
-            
 
-        msg = Message( subject=f"Подтверждение регистрации",
-            sender="kapshaioleg@yandex.ru",
-            recipients=[new_user.email],
-            )
-        
-        msg.html = render_template("accept_email_email.html", user=new_user, link=link)
+        link = self.link_to_accept_email(new_user.email)
 
         db.session.add(new_user)
-        mail.send(msg)
-
+        mailer.accept_registration(new_user, link)
         db.session.commit()
         return new_user
 
@@ -61,16 +45,10 @@ class DBManager():
         if not db.session.execute(db.select(User).where(User.email == email)).scalar():
             return False
 
-        link = "http://" + os.getenv("DOMAIN") + \
-            "/users/change_password/" + self.link_to_accept_email(email)
-        
+        link = self.link_to_accept_email(email)      
         self.redis.setex(email, redis_accept_email_time, psw)
-        msg = Message( subject=f"Подтверждение смены пароля",
-            sender="kapshaioleg@yandex.ru",
-            recipients=[email],
-            )
-        msg.html = render_template("change_password_mail.html", link=link)
-        mail.send(msg)
+        mailer.change_password(link, email)
+
         return True
 
     def accept_password_change(self, name):
@@ -112,10 +90,21 @@ class DBManager():
         
     def redirect(self, link_name):
         if not (link:=self.redis.get(link2redis(link_name))):
-            link = db.session.execute(db.select(Link).where(Link.name == link_name)).scalar()
+            link = db.session.execute(db.select(Link).\
+                                      where(Link.name == link_name)).scalar()
             if link:
+                if link.is_blocked:
+                    return
+                user = db.session.execute(db.select(User).\
+                                          where(User.id == link.user_id)).scalar()
+                if user.is_blocked:
+                    db.session.execute(db.update(Link).\
+                                       values(is_blocked=True).\
+                                        where(Link.user_id == user.id))
+                    db.session.commit()
+                    return
+                self.redis.setex(link2redis(link_name), redis_time, link.url)
                 link = link.url
-                self.redis.setex(link2redis(link_name), redis_time, link)
         return link
     
     def get_user_links(self, id):

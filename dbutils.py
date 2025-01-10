@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 load_dotenv()
 
-redis_time = timedelta(seconds=30) #change
+redis_time = timedelta(minutes=30) 
 redis_accept_email_time = timedelta(days=1) 
 
 

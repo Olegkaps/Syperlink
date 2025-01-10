@@ -30,6 +30,7 @@ class Link(db.Model):
   name: Mapped[str] = mapped_column(String(os.getenv("TOKEN_LENGTH")), primary_key=True)
   url: Mapped[str] = mapped_column(String(300))
   user_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
+  is_blocked: Mapped[bool] = mapped_column()
 
   def __repr__(self):
     return f" {self.name} {self.url} "

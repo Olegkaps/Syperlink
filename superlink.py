@@ -6,7 +6,7 @@ from flask import Flask, render_template
 
 from database import db
 from routes import syperlink, menu
-from dbactions import mail
+from mail import mailer
 
 load_dotenv()
 
@@ -25,7 +25,7 @@ app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASSWORD')
 app.register_blueprint(syperlink)
 
 db.init_app(app)
-mail.init_app(app)
+mailer.init_app(app)
 
 ISDEBUG = True # False for relesae server
 
