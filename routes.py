@@ -3,7 +3,7 @@ from flask import render_template, request, flash, redirect, url_for, session, B
 
 
 from forms import *
-from dbactions import DB
+from dbactions import links, auth
 
 
 syperlink = Blueprint('sl', __name__)
@@ -23,7 +23,7 @@ def index():
     if request.method == "POST":
         link = request.form.get("link")
 
-        short_link = DB.add_link(link, session["id"])
+        short_link = links.add_link(link, session["id"])
         if short_link:
             link = "http://" + os.getenv("DOMAIN") + "/" + short_link.name
             flash("Успешно", "message")
@@ -35,7 +35,7 @@ def index():
 
 @syperlink.route("/<link>")
 def redirect_to_real_url(link):
-    url = DB.redirect(link)
+    url = links.redirect(link)
     if url:
         return redirect(url)
     else:
@@ -46,7 +46,7 @@ def redirect_to_real_url(link):
 def info():
     form = LinksInfoForm()
     if request.method == "POST" and form.validate_on_submit():
-        links, name = DB.get_info_links(form.Val.data)
+        links, name = links.get_info_links(form.Val.data)
     else:
         name = ""
         links = []
@@ -62,7 +62,7 @@ def users():
             del session['name']
             del session['id']
         else:
-            links = DB.get_user_links(session['id'])
+            links = links.get_user_links(session['id'])
             return render_template("profile.html", title="Аккаунт", menu=menu, username=session['name'], links=links)
     
     return redirect(url_for("sl.sign_in"))
@@ -76,7 +76,7 @@ def sign_in():
 
     form = LoginForm()
     if form.validate_on_submit():
-        if user := DB.log_in(form):
+        if user := auth.log_in(form):
             session.permanent = True
             session['authorised'] = True
             session['name'] = user.login
@@ -84,7 +84,6 @@ def sign_in():
             return redirect(url_for("sl.users"))
         else:
             flash("Неверный пароль или логин.", "error")
-    
 
     return render_template("sign-in.html", title="Войти", menu=menu, auth_menu=authorization_menu, form=form)
 
@@ -96,9 +95,8 @@ def sign_up():
 
     form = RegistrationForm()
     if form.validate_on_submit():
-        new_user = DB.registrate(form)
+        new_user = auth.registrate(form)
         if new_user:
-
             flash("Успешная регистрация", "message")
             flash("Письмо для подтверждения регистрации отправлено на почту ", "message")
             return redirect(url_for("sl.accept_email"))
@@ -115,8 +113,11 @@ def accept_email():
 
 @syperlink.route("/users/accept/<link>")
 def accept_email_link(link):
-    DB.accept_email(link)
-    flash("Почта успешно подтверждена, вы можете войти.", "message")
+    if auth.accept_email(link):
+        flash("Почта успешно подтверждена, вы можете войти.", "message")
+    else:
+        flash("Неверная ссылка для подтверждения.", "error")
+    
     return render_template("accept_email.html", title="Успешно", menu=menu)
 
 
@@ -124,18 +125,19 @@ def accept_email_link(link):
 def change_password():
     form = ChangePasswordForm()
     if request.method == "POST" and form.validate_on_submit():
-        if DB.change_password(form):
+        if auth.change_password(form):
             flash("Письмо подтверждение отправлено на почту", "message")
         else:
             flash("Почта не найдена", "error")
         return redirect(url_for("sl.sign_in"))
-
     return render_template("change_password.html", title="Восстановление аккаунта", menu=menu, form=form)
+
 
 @syperlink.route("/users/change_password/<name>")
 def accept_password_change(name):
-    if DB.accept_password_change(name):
+    if auth.accept_password_change(name):
         flash("Успешно", "message")
     else:
         flash("Операция отклонена", "error")
+
     return redirect(url_for("sl.sign_in"))

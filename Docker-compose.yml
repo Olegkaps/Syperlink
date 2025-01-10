@@ -29,6 +29,7 @@ services:
     build: .
     volumes:
       - ./migrations:/superlink/migrations
+      - ./log:/syperlink/log
     expose:
       - 5000
     depends_on:
@@ -51,3 +52,4 @@ volumes:
   pgdbdata: null
   static_volume: null
   migrations: null
+  log: null

@@ -4,6 +4,11 @@ from dotenv import load_dotenv
 from flask_mail import Message, Mail
 from flask import render_template
 
+
+from logger import Logger
+
+mail_logger = Logger.get_logger("MAIL")
+
 load_dotenv()
 
 
@@ -26,6 +31,7 @@ class Mailer():
         
         msg.html = render_template("accept_email_email.html", user=new_user, link=link)
         self.mail.send(msg)
+        mail_logger.info(f"Send {link} to {new_user.email}")
 
     def change_password(self, link, email):
         link = "http://" + os.getenv("DOMAIN") + \
@@ -37,6 +43,7 @@ class Mailer():
             )
         msg.html = render_template("change_password_mail.html", link=link)
         self.mail.send(msg)
+        mail_logger.info(f"Send {link} to {email}")
 
 
 
