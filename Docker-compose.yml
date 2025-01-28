@@ -28,7 +28,7 @@ services:
   syperlink:
     build: .
     volumes:
-      - ./migrations:/superlink/migrations
+      - ./migrations:/syperlink/migrations
       - ./log:/syperlink/log
     expose:
       - 5000

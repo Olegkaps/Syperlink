@@ -9,9 +9,9 @@ from mail import mailer
 
 
 class DBManager():
-    def __init__(self):
+    def __init__(self, r):
         self.link_gen = link_generator()
-        self.redis = Redis(host="redis", port=6379, decode_responses=True)
+        self.redis = r
 
 class Authorization(DBManager):
     def log_in(self, form): 
@@ -146,5 +146,6 @@ class Links(DBManager):
         return links, val
 
 
-auth = Authorization()
-links = Links()
+r = Redis(host="redis", port=6379, decode_responses=True)
+auth_db = Authorization(r)
+links_db = Links(r)

@@ -4,3 +4,4 @@ instance/
 pgdbdata/
 .vscode
 .env
+log/

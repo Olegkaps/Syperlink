@@ -1,6 +1,6 @@
 FROM tiangolo/uvicorn-gunicorn:python3.11
 
-WORKDIR /superlink
+WORKDIR /syperlink
 
 COPY requirements.txt ./
 
