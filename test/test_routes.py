@@ -43,3 +43,17 @@ def client(app):
 def test_get_request(client, url, status):
         response = client.get(url)
         assert response.status_code == status
+
+
+def test_authentification(client):
+    response = client.post("/users/sign_in", data={
+        "val": "Karblue",
+        "password": "lovephobia1",
+    })
+    assert response.status_code == 200
+    
+    response = client.post("/users/sign_in", data={
+        "name": "Karblue",
+        "password": "lovephobia1",
+    })
+    assert response.status_code == 200
